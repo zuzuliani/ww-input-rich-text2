@@ -952,7 +952,14 @@ export default {
                 },
                 onUpdate: this.handleOnUpdate,
                 onSelectionUpdate: () => {
-                    this.setSelectedText(this.getSelectedText());
+                    const rawSelectedText = this.getSelectedText();
+                    this.setSelectedText(rawSelectedText);
+                    if (rawSelectedText) {
+                        this.$emit('trigger-event', { 
+                            name: 'textSelected', 
+                            event: { selectedText: rawSelectedText } 
+                        });
+                    }
                 },
                 editorProps: {
                     handleClickOn: (view, pos, node) => {

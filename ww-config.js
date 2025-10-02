@@ -122,6 +122,7 @@ export default {
         { name: 'mention:click', label: { en: 'On mention click' }, event: { mention: { id: '', label: '' } } },
         { name: 'focus', label: { en: 'On focus' }, event: { value: '' } },
         { name: 'blur', label: { en: 'On blur' }, event: { value: '' } },
+        { name: 'textSelected', label: { en: 'On Text Selected' }, event: { selectedText: '' } },
     ],
     actions: [
         { label: 'Focus Rich text', action: 'focusEditor' },
