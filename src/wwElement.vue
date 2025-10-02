@@ -452,6 +452,14 @@ export default {
             readonly: true,
         });
 
+        const { value: selectedText, setValue: setSelectedText } = wwLib.wwVariable.useComponentVariable({
+            uid: props.uid,
+            name: 'selectedText',
+            type: 'string',
+            defaultValue: '',
+            readonly: true,
+        });
+
         /* wwEditor:start */
         const { createElement } = wwLib.useCreateElement();
         /* wwEditor:end */
@@ -477,6 +485,8 @@ export default {
             setMentions,
             states,
             setStates,
+            selectedText,
+            setSelectedText,
             randomUid,
             /* wwEditor:start */
             createElement,
@@ -941,6 +951,9 @@ export default {
                     this.setMentions(this.richEditor.getJSON().content.reduce(extractMentions, []));
                 },
                 onUpdate: this.handleOnUpdate,
+                onSelectionUpdate: () => {
+                    this.setSelectedText(this.getSelectedText());
+                },
                 editorProps: {
                     handleClickOn: (view, pos, node) => {
                         if (node.type.name === 'mention') {
@@ -1072,6 +1085,12 @@ export default {
         getContent() {
             if (this.content.output === 'markdown') return this.richEditor.storage.markdown.getMarkdown();
             return this.richEditor.getHTML();
+        },
+        getSelectedText() {
+            if (!this.richEditor) return '';
+            const { from, to } = this.richEditor.state.selection;
+            if (from === to) return '';
+            return this.richEditor.state.doc.textBetween(from, to);
         },
         /* Table */
         insertTable() {
