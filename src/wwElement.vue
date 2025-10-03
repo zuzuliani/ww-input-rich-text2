@@ -1133,9 +1133,8 @@ export default {
                 return;
             }
 
-            const { state, dispatch } = this.richEditor.view;
-            const { doc, tr } = state;
-            let hasChanges = false;
+            const { state } = this.richEditor.view;
+            const { doc } = state;
             const convertedMentions = [];
 
             // Get all text nodes in the document
@@ -1163,38 +1162,34 @@ export default {
                                 const start = match.index;
                                 const end = start + match[0].length;
                                 
-                                // Create mention mark
-                                const mentionMarkType = state.schema.marks.mention;
-                                if (mentionMarkType) {
-                                    console.log('Creating mention mark for:', mentionText, 'at position:', pos + start, 'to', pos + end);
-                                    tr.replaceWith(
-                                        pos + start,
-                                        pos + end,
-                                        state.schema.text(mentionText, [
-                                            mentionMarkType.create({ id: mention.id, label: mentionText })
-                                        ])
-                                    );
-                                    hasChanges = true;
-                                    
-                                    // Track this conversion for trigger event
-                                    convertedMentions.push({
-                                        id: mention.id,
-                                        label: mentionText
-                                    });
-                                    
-                                    console.log('Mention mark created successfully');
-                                }
+                                // Use the editor's command system to insert the mention (same as manual mentions)
+                                console.log('Inserting mention using editor command for:', mentionText, 'at position:', pos + start, 'to', pos + end);
+                                
+                                // Set selection to the matched text and replace with mention
+                                this.richEditor.chain()
+                                    .setTextSelection({ from: pos + start, to: pos + end })
+                                    .insertContent({
+                                        type: 'mention',
+                                        attrs: { id: mention.id, label: mentionText }
+                                    })
+                                    .run();
+                                
+                                // Track this conversion for trigger event
+                                convertedMentions.push({
+                                    id: mention.id,
+                                    label: mentionText
+                                });
+                                
+                                console.log('Mention inserted successfully using command');
                             }
                         }
                     });
                 }
             });
 
-            if (hasChanges) {
-                console.log('Dispatching transaction with', convertedMentions.length, 'conversions');
-                dispatch(tr);
-                
-                // Emit trigger events for each converted mention
+            // Emit trigger events for each converted mention
+            if (convertedMentions.length > 0) {
+                console.log('Emitting trigger events for', convertedMentions.length, 'conversions');
                 convertedMentions.forEach(mention => {
                     console.log('Emitting autoMention trigger for:', mention);
                     this.$emit('trigger-event', {
@@ -1203,7 +1198,7 @@ export default {
                     });
                 });
             } else {
-                console.log('No changes to dispatch');
+                console.log('No mentions converted');
             }
         },
         /* Table */
