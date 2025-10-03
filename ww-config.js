@@ -56,6 +56,7 @@ export default {
             'debounceDelay',
             'autofocus',
             'enableMention',
+            'enableAutoMention',
             [
                 'mentionChar',
                 'mentionAllowSpaces',

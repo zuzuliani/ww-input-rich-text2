@@ -1118,7 +1118,15 @@ export default {
             return this.richEditor.state.doc.textBetween(from, to);
         },
         convertToAutoMentions() {
+            console.log('convertToAutoMentions called', {
+                enableAutoMention: this.content.enableAutoMention,
+                enableMention: this.content.enableMention,
+                mentionListLength: this.mentionList.length,
+                mentionList: this.mentionList
+            });
+            
             if (!this.content.enableAutoMention || !this.content.enableMention || !this.mentionList.length) {
+                console.log('Auto mention conversion skipped - conditions not met');
                 return;
             }
 
@@ -1130,6 +1138,7 @@ export default {
             // Get all text nodes in the document
             doc.descendants((node, pos) => {
                 if (node.isText && node.text) {
+                    console.log('Processing text node:', node.text);
                     let newText = node.text;
                     let offset = 0;
 
@@ -1138,9 +1147,11 @@ export default {
                         if (mention.label && mention.id) {
                             const mentionText = mention.label;
                             const regex = new RegExp(`\\b${mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+                            console.log('Checking mention:', mentionText, 'against text:', newText, 'regex:', regex);
                             
                             let match;
                             while ((match = regex.exec(newText)) !== null) {
+                                console.log('Found match:', match[0], 'at position:', match.index);
                                 const start = match.index + offset;
                                 const end = start + match[0].length;
                                 
