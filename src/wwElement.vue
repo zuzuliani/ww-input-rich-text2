@@ -936,6 +936,9 @@ export default {
                             HTMLAttributes: {
                                 class: 'mention',
                             },
+                            renderText({ node }) {
+                                return node.attrs.label || '';
+                            },
                             suggestion: {
                                 items: ({ query }) =>
                                     this.editorConfig.mention.list
@@ -1139,50 +1142,47 @@ export default {
             doc.descendants((node, pos) => {
                 if (node.isText && node.text) {
                     console.log('Processing text node:', node.text);
-                    let newText = node.text;
-                    let offset = 0;
+                    
+                    // Check if this text node already has mention marks
+                    const hasMentionMark = node.marks.some(mark => mark.type.name === 'mention');
+                    if (hasMentionMark) {
+                        console.log('Text node already has mention mark, skipping');
+                        return;
+                    }
 
                     // Check each mention in the list
                     this.mentionList.forEach(mention => {
                         if (mention.label && mention.id) {
                             const mentionText = mention.label;
                             const regex = new RegExp(`\\b${mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-                            console.log('Checking mention:', mentionText, 'against text:', newText, 'regex:', regex);
+                            console.log('Checking mention:', mentionText, 'against text:', node.text, 'regex:', regex);
                             
                             let match;
-                            while ((match = regex.exec(newText)) !== null) {
+                            while ((match = regex.exec(node.text)) !== null) {
                                 console.log('Found match:', match[0], 'at position:', match.index);
-                                const start = match.index + offset;
+                                const start = match.index;
                                 const end = start + match[0].length;
                                 
-                                // Check if this text is already a mention
-                                const mentionMark = node.marks.find(mark => mark.type.name === 'mention');
-                                if (!mentionMark) {
-                                    // Replace the text with a mention
-                                    const beforeText = newText.substring(0, start);
-                                    const afterText = newText.substring(end);
-                                    newText = beforeText + afterText;
+                                // Create mention mark
+                                const mentionMarkType = state.schema.marks.mention;
+                                if (mentionMarkType) {
+                                    console.log('Creating mention mark for:', mentionText, 'at position:', pos + start, 'to', pos + end);
+                                    tr.replaceWith(
+                                        pos + start,
+                                        pos + end,
+                                        state.schema.text(mentionText, [
+                                            mentionMarkType.create({ id: mention.id, label: mentionText })
+                                        ])
+                                    );
+                                    hasChanges = true;
                                     
-                                    // Create mention mark
-                                    const mentionMarkType = state.schema.marks.mention;
-                                    if (mentionMarkType) {
-                                        tr.replaceWith(
-                                            pos + start,
-                                            pos + end,
-                                            state.schema.text(mentionText, [
-                                                mentionMarkType.create({ id: mention.id, label: mentionText })
-                                            ])
-                                        );
-                                        hasChanges = true;
-                                        
-                                        // Track this conversion for trigger event
-                                        convertedMentions.push({
-                                            id: mention.id,
-                                            label: mentionText
-                                        });
-                                    }
+                                    // Track this conversion for trigger event
+                                    convertedMentions.push({
+                                        id: mention.id,
+                                        label: mentionText
+                                    });
                                     
-                                    offset -= (end - start);
+                                    console.log('Mention mark created successfully');
                                 }
                             }
                         }
@@ -1191,15 +1191,19 @@ export default {
             });
 
             if (hasChanges) {
+                console.log('Dispatching transaction with', convertedMentions.length, 'conversions');
                 dispatch(tr);
                 
                 // Emit trigger events for each converted mention
                 convertedMentions.forEach(mention => {
+                    console.log('Emitting autoMention trigger for:', mention);
                     this.$emit('trigger-event', {
                         name: 'autoMention',
                         event: { mention: { id: mention.id, label: mention.label } }
                     });
                 });
+            } else {
+                console.log('No changes to dispatch');
             }
         },
         /* Table */
