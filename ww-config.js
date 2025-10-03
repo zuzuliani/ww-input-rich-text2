@@ -123,6 +123,7 @@ export default {
         { name: 'mention:click', label: { en: 'On mention click' }, event: { mention: { id: '', label: '' } } },
         { name: 'focus', label: { en: 'On focus' }, event: { value: '' } },
         { name: 'blur', label: { en: 'On blur' }, event: { value: '' } },
+        { name: 'enter', label: { en: 'On Enter' }, event: { value: '' } },
         { name: 'textSelected', label: { en: 'On Text Selected' }, event: { selectedText: '' } },
         { name: 'textUnselected', label: { en: 'On Text Unselected' }, event: { previousSelectedText: '' } },
         { name: 'autoMention', label: { en: 'On Automatic Mention' }, event: { mention: { id: '', label: '' } } },

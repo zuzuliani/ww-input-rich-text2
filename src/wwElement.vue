@@ -991,6 +991,15 @@ export default {
                             });
                         }
                     },
+                    handleKeyDown: (view, event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                            this.$emit('trigger-event', {
+                                name: 'enter',
+                                event: { value: this.getContent() }
+                            });
+                        }
+                        return false; // Allow default behavior
+                    },
                 },
             });
             this.loading = false;
