@@ -497,6 +497,7 @@ export default {
         richEditor: null,
         loading: false,
         iconHTMLs: {},
+        previousSelectedText: '',
     }),
 
     watch: {
@@ -953,13 +954,26 @@ export default {
                 onUpdate: this.handleOnUpdate,
                 onSelectionUpdate: () => {
                     const rawSelectedText = this.getSelectedText();
-                    this.setSelectedText(rawSelectedText);
-                    if (rawSelectedText) {
+                    
+                    // Check if text was unselected (had text before, now empty)
+                    if (this.previousSelectedText && !rawSelectedText) {
+                        this.$emit('trigger-event', { 
+                            name: 'textUnselected', 
+                            event: { previousSelectedText: this.previousSelectedText } 
+                        });
+                    }
+                    
+                    // Check if text was selected (was empty before, now has text)
+                    if (!this.previousSelectedText && rawSelectedText) {
                         this.$emit('trigger-event', { 
                             name: 'textSelected', 
                             event: { selectedText: rawSelectedText } 
                         });
                     }
+                    
+                    // Update the component variable and previous selection
+                    this.setSelectedText(rawSelectedText);
+                    this.previousSelectedText = rawSelectedText;
                 },
                 editorProps: {
                     handleClickOn: (view, pos, node) => {

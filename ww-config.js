@@ -123,6 +123,7 @@ export default {
         { name: 'focus', label: { en: 'On focus' }, event: { value: '' } },
         { name: 'blur', label: { en: 'On blur' }, event: { value: '' } },
         { name: 'textSelected', label: { en: 'On Text Selected' }, event: { selectedText: '' } },
+        { name: 'textUnselected', label: { en: 'On Text Unselected' }, event: { previousSelectedText: '' } },
     ],
     actions: [
         { label: 'Focus Rich text', action: 'focusEditor' },
