@@ -992,6 +992,10 @@ export default {
             let htmlValue = this.getContent();
             if (this.variableValue === htmlValue) return;
             this.setValue(htmlValue);
+            
+            // Convert matching text to automatic mentions
+            this.convertToAutoMentions();
+            
             if (this.content.debounce) {
                 this.isDebouncing = true;
                 if (this.debounce) {
@@ -1112,6 +1116,80 @@ export default {
             const { from, to } = this.richEditor.state.selection;
             if (from === to) return '';
             return this.richEditor.state.doc.textBetween(from, to);
+        },
+        convertToAutoMentions() {
+            if (!this.content.enableAutoMention || !this.content.enableMention || !this.mentionList.length) {
+                return;
+            }
+
+            const { state, dispatch } = this.richEditor.view;
+            const { doc, tr } = state;
+            let hasChanges = false;
+            const convertedMentions = [];
+
+            // Get all text nodes in the document
+            doc.descendants((node, pos) => {
+                if (node.isText && node.text) {
+                    let newText = node.text;
+                    let offset = 0;
+
+                    // Check each mention in the list
+                    this.mentionList.forEach(mention => {
+                        if (mention.label && mention.id) {
+                            const mentionText = mention.label;
+                            const regex = new RegExp(`\\b${mentionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+                            
+                            let match;
+                            while ((match = regex.exec(newText)) !== null) {
+                                const start = match.index + offset;
+                                const end = start + match[0].length;
+                                
+                                // Check if this text is already a mention
+                                const mentionMark = node.marks.find(mark => mark.type.name === 'mention');
+                                if (!mentionMark) {
+                                    // Replace the text with a mention
+                                    const beforeText = newText.substring(0, start);
+                                    const afterText = newText.substring(end);
+                                    newText = beforeText + afterText;
+                                    
+                                    // Create mention mark
+                                    const mentionMarkType = state.schema.marks.mention;
+                                    if (mentionMarkType) {
+                                        tr.replaceWith(
+                                            pos + start,
+                                            pos + end,
+                                            state.schema.text(mentionText, [
+                                                mentionMarkType.create({ id: mention.id, label: mentionText })
+                                            ])
+                                        );
+                                        hasChanges = true;
+                                        
+                                        // Track this conversion for trigger event
+                                        convertedMentions.push({
+                                            id: mention.id,
+                                            label: mentionText
+                                        });
+                                    }
+                                    
+                                    offset -= (end - start);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (hasChanges) {
+                dispatch(tr);
+                
+                // Emit trigger events for each converted mention
+                convertedMentions.forEach(mention => {
+                    this.$emit('trigger-event', {
+                        name: 'autoMention',
+                        event: { mention: { id: mention.id, label: mention.label } }
+                    });
+                });
+            }
         },
         /* Table */
         insertTable() {

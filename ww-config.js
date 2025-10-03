@@ -124,6 +124,7 @@ export default {
         { name: 'blur', label: { en: 'On blur' }, event: { value: '' } },
         { name: 'textSelected', label: { en: 'On Text Selected' }, event: { selectedText: '' } },
         { name: 'textUnselected', label: { en: 'On Text Unselected' }, event: { previousSelectedText: '' } },
+        { name: 'autoMention', label: { en: 'On Automatic Mention' }, event: { mention: { id: '', label: '' } } },
     ],
     actions: [
         { label: 'Focus Rich text', action: 'focusEditor' },
@@ -355,6 +356,15 @@ export default {
             },
             type: 'OnOff',
             defaultValue: false,
+        },
+        enableAutoMention: {
+            section: 'settings',
+            label: {
+                en: 'Automatic mentions',
+            },
+            type: 'OnOff',
+            defaultValue: false,
+            hidden: content => !content.enableMention,
         },
         mentionList: {
             section: 'settings',
