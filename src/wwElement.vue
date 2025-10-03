@@ -963,8 +963,8 @@ export default {
                         });
                     }
                     
-                    // Check if text was selected (was empty before, now has text)
-                    if (!this.previousSelectedText && rawSelectedText) {
+                    // Fire textSelected whenever there's currently selected text
+                    if (rawSelectedText) {
                         this.$emit('trigger-event', { 
                             name: 'textSelected', 
                             event: { selectedText: rawSelectedText } 
