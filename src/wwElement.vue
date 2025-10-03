@@ -1114,6 +1114,9 @@ export default {
         redo() {
             this.richEditor.chain().redo().run();
         },
+        clearInput() {
+            this.richEditor.chain().focus().clearContent().run();
+        },
         getContent() {
             if (this.content.output === 'markdown') return this.richEditor.storage.markdown.getMarkdown();
             return this.richEditor.getHTML();

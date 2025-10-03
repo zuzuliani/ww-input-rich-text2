@@ -233,6 +233,7 @@ export default {
         },
         { label: 'Undo', action: 'undo' },
         { label: 'Redo', action: 'redo' },
+        { label: 'Clear Input', action: 'clearInput' },
         { label: 'Get Selected Text', action: 'getSelectedText' },
         // Table
         {
