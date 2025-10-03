@@ -784,8 +784,12 @@ export default {
                 '--mention-fontFamily': this.content.mention.fontFamily,
                 '--mention-fontWeight': this.content.mention.fontWeight,
                 '--mention-color': this.content.mention.color,
+                '--mention-backgroundColor': this.content.mention.backgroundColor,
+                '--mention-borderColor': this.content.mention.borderColor,
                 '--mention-borderSize': this.content.mention.borderSize,
-                '--mention-border-radius': this.content.mention.borderRadius,
+                '--mention-borderRadius': this.content.mention.borderRadius,
+                '--mention-fontWeight': this.content.mention.isBold ? 'bold' : 'normal',
+                '--mention-textDecoration': this.content.mention.isUnderline ? 'underline' : 'none',
                 // a
                 '--a-fontSize': this.content.a.fontSize,
                 '--a-fontFamily': this.content.a.fontFamily,
@@ -1472,15 +1476,17 @@ export default {
         }
 
         .mention {
-            border: var(--mention-borderSize) solid var(--mention-color);
-            border-radius: var(--mention-border-radius);
+            border: var(--mention-borderSize) solid var(--mention-borderColor);
+            border-radius: var(--mention-borderRadius);
             padding: 0.1rem 0.3rem;
             box-decoration-break: clone;
             cursor: pointer;
             font-size: var(--mention-fontSize);
             font-family: var(--mention-fontFamily);
-            font-weight: var(--mention-fontSize);
+            font-weight: var(--mention-fontWeight);
             color: var(--mention-color);
+            background-color: var(--mention-backgroundColor);
+            text-decoration: var(--mention-textDecoration);
         }
 
         table {

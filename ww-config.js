@@ -696,15 +696,47 @@ export default {
                     fontSize: textOptions.fontSize,
                     fontFamily: textOptions.fontFamily,
                     fontWeight: textOptions.fontWeight,
-                    color: textOptions.color,
+                    color: {
+                        type: 'Color',
+                        label: {
+                            en: 'Text color',
+                            fr: 'Couleur du texte',
+                        },
+                        bindable: true,
+                        options: {
+                            nullable: true,
+                        },
+                    },
+                    backgroundColor: {
+                        type: 'Color',
+                        label: {
+                            en: 'Background color',
+                            fr: 'Couleur de fond',
+                        },
+                        bindable: true,
+                        options: {
+                            nullable: true,
+                        },
+                    },
+                    borderColor: {
+                        type: 'Color',
+                        label: {
+                            en: 'Border color',
+                            fr: 'Couleur de bordure',
+                        },
+                        bindable: true,
+                        options: {
+                            nullable: true,
+                        },
+                    },
                     borderSize: {
                         type: 'Length',
                         label: {
-                            en: 'Border',
-                            fr: 'Bordure',
+                            en: 'Border size',
+                            fr: 'Taille de bordure',
                         },
                         options: {
-                            unitChoices: [{ value: 'px', label: 'px', min: 1, max: 10 }],
+                            unitChoices: [{ value: 'px', label: 'px', min: 0, max: 10 }],
                             noRange: true,
                             useVar: true,
                         },
@@ -718,10 +750,26 @@ export default {
                         },
                         bindable: true,
                         options: {
-                            unitChoices: [{ value: 'px', label: 'px', min: 1, max: 10 }],
+                            unitChoices: [{ value: 'px', label: 'px', min: 0, max: 20 }],
                             noRange: true,
                             useVar: true,
                         },
+                    },
+                    isBold: {
+                        type: 'OnOff',
+                        label: {
+                            en: 'Bold',
+                            fr: 'Gras',
+                        },
+                        bindable: true,
+                    },
+                    isUnderline: {
+                        type: 'OnOff',
+                        label: {
+                            en: 'Underline',
+                            fr: 'Souligné',
+                        },
+                        bindable: true,
                     },
                 },
                 singleLine: true,
@@ -729,10 +777,14 @@ export default {
             defaultValue: {
                 fontSize: '16px',
                 fontFamily: '',
-                fontFWeight: '',
+                fontWeight: '',
                 color: '#099AF2',
+                backgroundColor: '',
+                borderColor: '#099AF2',
                 borderSize: '1px',
                 borderRadius: '6px',
+                isBold: false,
+                isUnderline: false,
             },
             states: true,
             classes: true,
